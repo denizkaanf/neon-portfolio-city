@@ -5,10 +5,11 @@
    stop() MUST cancel the loop and remove listeners (called by closeModal).
    ===================================================================== */
 
-function startMiniGame(id, canvas) {
+function startMiniGame(id, canvas, strings) {
   if (!canvas) return { stop() {} };
-  if (id === "runner") return GridRunner(canvas);
-  if (id === "snake") return NeonSnake(canvas);
+  const S = Object.assign({ score: "SCORE", best: "BEST", crash: "SYSTEM CRASH", lost: "CONNECTION LOST", retry: "SPACE / TAP to retry" }, strings || {});
+  if (id === "runner") return GridRunner(canvas, S);
+  if (id === "snake") return NeonSnake(canvas, S);
   return { stop() {} };
 }
 
@@ -17,7 +18,7 @@ const MG = {
 };
 
 /* ---------------------- NEON RUNNER (endless runner) ----------------- */
-function GridRunner(canvas) {
+function GridRunner(canvas, S) {
   const ctx = canvas.getContext("2d");
   ctx.imageSmoothingEnabled = false;
   const W = canvas.width, H = canvas.height, GROUND = H - 70;
@@ -103,15 +104,15 @@ function GridRunner(canvas) {
     ctx.fillStyle = NEON; ctx.fillRect(player.x, py + ph - 3, player.w, 3);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.font = "16px Consolas, monospace"; ctx.textAlign = "left";
-    ctx.fillStyle = NEON; ctx.fillText("SCORE " + Math.floor(score), 14, 26);
-    ctx.fillStyle = MAG; ctx.textAlign = "right"; ctx.fillText("BEST " + best, W - 14, 26);
+    ctx.fillStyle = NEON; ctx.fillText(S.score + " " + Math.floor(score), 14, 26);
+    ctx.fillStyle = MAG; ctx.textAlign = "right"; ctx.fillText(S.best + " " + best, W - 14, 26);
     if (state === "over") {
       ctx.fillStyle = "rgba(2,3,8,0.7)"; ctx.fillRect(0, 0, W, H);
       ctx.textAlign = "center";
-      ctx.fillStyle = MAG; ctx.font = "28px Consolas, monospace"; ctx.fillText("SYSTEM CRASH", W / 2, H / 2 - 14);
+      ctx.fillStyle = MAG; ctx.font = "28px Consolas, monospace"; ctx.fillText(S.crash, W / 2, H / 2 - 14);
       ctx.fillStyle = NEON; ctx.font = "14px Consolas, monospace";
-      ctx.fillText("SCORE " + Math.floor(score) + "   ·   BEST " + best, W / 2, H / 2 + 12);
-      ctx.fillStyle = "#c8f7ff"; ctx.fillText("SPACE / TAP to retry", W / 2, H / 2 + 40);
+      ctx.fillText(S.score + " " + Math.floor(score) + "   ·   " + S.best + " " + best, W / 2, H / 2 + 12);
+      ctx.fillStyle = "#c8f7ff"; ctx.fillText(S.retry, W / 2, H / 2 + 40);
     }
   }
 
@@ -133,7 +134,7 @@ function GridRunner(canvas) {
 }
 
 /* ---------------------- DATA SNAKE (grid snake) --------------------- */
-function NeonSnake(canvas) {
+function NeonSnake(canvas, S) {
   const ctx = canvas.getContext("2d");
   ctx.imageSmoothingEnabled = false;
   const W = canvas.width, H = canvas.height;
@@ -215,15 +216,15 @@ function NeonSnake(canvas) {
       ctx.fillStyle = c; ctx.fillRect(s.x * CELL + 1, s.y * CELL + 1, CELL - 2, CELL - 2);
     });
     ctx.font = "16px Consolas, monospace"; ctx.textAlign = "left";
-    ctx.fillStyle = NEON; ctx.fillText("SCORE " + score, 12, 24);
-    ctx.fillStyle = MAG; ctx.textAlign = "right"; ctx.fillText("BEST " + best, W - 12, 24);
+    ctx.fillStyle = NEON; ctx.fillText(S.score + " " + score, 12, 24);
+    ctx.fillStyle = MAG; ctx.textAlign = "right"; ctx.fillText(S.best + " " + best, W - 12, 24);
     if (state === "over") {
       ctx.fillStyle = "rgba(2,3,8,0.72)"; ctx.fillRect(0, 0, W, H);
       ctx.textAlign = "center";
-      ctx.fillStyle = MAG; ctx.font = "28px Consolas, monospace"; ctx.fillText("CONNECTION LOST", W / 2, H / 2 - 14);
+      ctx.fillStyle = MAG; ctx.font = "28px Consolas, monospace"; ctx.fillText(S.lost, W / 2, H / 2 - 14);
       ctx.fillStyle = NEON; ctx.font = "14px Consolas, monospace";
-      ctx.fillText("SCORE " + score + "   ·   BEST " + best, W / 2, H / 2 + 12);
-      ctx.fillStyle = "#c8f7ff"; ctx.fillText("SPACE / TAP to retry", W / 2, H / 2 + 40);
+      ctx.fillText(S.score + " " + score + "   ·   " + S.best + " " + best, W / 2, H / 2 + 12);
+      ctx.fillStyle = "#c8f7ff"; ctx.fillText(S.retry, W / 2, H / 2 + 40);
     }
   }
 

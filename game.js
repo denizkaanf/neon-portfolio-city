@@ -39,6 +39,9 @@
     const hn = document.querySelector("#topbar .hint"); if (hn) hn.innerHTML = t("hint");
     const hr = document.getElementById("hire"); if (hr) hr.innerHTML = t("hire");
     const lg = document.getElementById("lang"); if (lg) lg.textContent = lang === "tr" ? "EN" : "TR";
+    const fh = document.getElementById("firsthint"); if (fh) fh.innerHTML = t("firsthint");
+    const ph = document.getElementById("photo-hint"); if (ph) ph.innerHTML = t("photoHint");
+    const ld = document.getElementById("loader"); if (ld) ld.textContent = t("loader");
   }
 
   // ---- world data: CIRCULAR cyberpunk town (Town-of-Salem style) -----
@@ -182,6 +185,16 @@
     "New in town? Press E at any tower.",
     "DaVinci Resolve in his sleep, they say.",
     "Find all the data-chips yet? Good luck."
+  ];
+  const NPC_LINES_TR = [
+    "O görüntü yönetmeni bir haftada koca bir film çekti. Saygı.",
+    "Cyan kuledeki reeller? Yürümeye değer.",
+    "Cesimar Antika'nın reklamları — onun işi. Cilalı.",
+    "Rengi büyücü gibi grade ediyormuş.",
+    "Lagertha Coffee onun çekiminden sonra 10 kat iyi göründü.",
+    "Şehirde yeni misin? Herhangi bir kulede E'ye bas.",
+    "DaVinci Resolve'u uykusunda kullanıyormuş derler.",
+    "Tüm veri-çiplerini buldun mu? Bol şans."
   ];
   let nearNpc = null;
 
@@ -519,7 +532,7 @@
   function tryInteract() {
     if (nearest) openModal(nearest.station);
     else if (nearTrain) startRide();
-    else if (nearNpc) { nearNpc.bubble = NPC_LINES[(Math.random() * NPC_LINES.length) | 0]; nearNpc.bubbleT = 3.4; Sound.ui(); }
+    else if (nearNpc) { const L = lang === "tr" ? NPC_LINES_TR : NPC_LINES; nearNpc.bubble = L[(Math.random() * L.length) | 0]; nearNpc.bubbleT = 3.4; Sound.ui(); }
   }
 
   // ---- modal ---------------------------------------------------------
@@ -535,6 +548,7 @@
   }
   function openModal(st) {
     modalOpen = true; lastStation = st;
+    const isTR = lang === "tr";
     Sound.enter();
     const wipe = document.getElementById("wipe");
     if (wipe) { wipe.classList.remove("play"); void wipe.offsetWidth; wipe.classList.add("play"); }
@@ -547,18 +561,19 @@
       html += `<h2>${esc(PORTFOLIO.name)}</h2>`;
       html += `<p class="role">${esc(lang === "tr" ? PORTFOLIO.roleTR : PORTFOLIO.role)}</p>`;
       html += `<p>${esc(lang === "tr" ? PORTFOLIO.bioTR : PORTFOLIO.bio)}</p>`;
-      html += `<div class="tags">` + PORTFOLIO.skills.map(s => `<span>${esc(s)}</span>`).join("") + `</div>`;
-      if (PORTFOLIO.experience) {
+      html += `<div class="tags">` + (isTR ? PORTFOLIO.skillsTR : PORTFOLIO.skills).map(s => `<span>${esc(s)}</span>`).join("") + `</div>`;
+      const exp = isTR ? PORTFOLIO.experienceTR : PORTFOLIO.experience;
+      if (exp) {
         html += `<h3 class="group">${t("experience")}</h3><ul class="cvlist">`;
-        PORTFOLIO.experience.forEach(e => {
+        exp.forEach(e => {
           html += `<li><b>${esc(e.role)}</b> <span class="meta">${esc(e.period)}</span>` +
             `<span class="org">${esc(e.org)}</span><span class="desc">${esc(e.desc)}</span></li>`;
         });
         html += `</ul>`;
       }
-      if (PORTFOLIO.education) html += `<h3 class="group">${t("education")}</h3><p>${esc(PORTFOLIO.education)}</p>`;
-      if (PORTFOLIO.software) html += `<h3 class="group">${t("software")}</h3><div class="tags">` + PORTFOLIO.software.map(s => `<span>${esc(s.n)} · ${esc(s.l)}</span>`).join("") + `</div>`;
-      if (PORTFOLIO.languages) html += `<h3 class="group">${t("languages")}</h3><div class="tags">` + PORTFOLIO.languages.map(s => `<span>${esc(s.n)} · ${esc(s.l)}</span>`).join("") + `</div>`;
+      if (PORTFOLIO.education) html += `<h3 class="group">${t("education")}</h3><p>${esc(isTR ? PORTFOLIO.educationTR : PORTFOLIO.education)}</p>`;
+      if (PORTFOLIO.software) html += `<h3 class="group">${t("software")}</h3><div class="tags">` + PORTFOLIO.software.map(s => `<span>${esc(s.n)} · ${esc(isTR ? (LEVELS_TR[s.l] || s.l) : s.l)}</span>`).join("") + `</div>`;
+      if (PORTFOLIO.languages) html += `<h3 class="group">${t("languages")}</h3><div class="tags">` + PORTFOLIO.languages.map(s => `<span>${esc(isTR ? (LANGNAME_TR[s.n] || s.n) : s.n)} · ${esc(isTR ? (LANGLVL_TR[s.l] || s.l) : s.l)}</span>`).join("") + `</div>`;
       html += `<div class="cta-row">`;
       if (c0.cvEN) html += `<a class="btn" href="${esc(c0.cvEN)}" download>${t("cvEN")}</a>`;
       if (c0.cvTR) html += `<a class="btn ghost" href="${esc(c0.cvTR)}" download>${t("cvTR")}</a>`;
@@ -582,7 +597,8 @@
     } else if (st.type === "gallery") {
       const g = st.gallery;
       html += `<h2>${esc(tl(g.title))}</h2>`;
-      html += `<p class="role">${esc(g.year || "")}${g.blurb ? " · " + esc(g.blurb) : ""}</p>`;
+      const gblurb = isTR ? (BLURBS_TR[g.title] || g.blurb) : g.blurb;
+      html += `<p class="role">${esc(g.year || "")}${gblurb ? " · " + esc(gblurb) : ""}</p>`;
       const allItems = (g.groups && g.groups.length) ? g.groups.reduce((a, gr) => a.concat(gr.items || []), []) : (g.items || []);
       if (allItems.some(it => it.type === "embed" || it.type === "video"))
         html += `<p class="vid-note">${t("vidNote")}</p>`;
@@ -609,7 +625,8 @@
       if (g.groups && g.groups.length) {
         g.groups.forEach(grp => {
           html += `<h3 class="group">${esc(grp.name)}</h3>`;
-          const cr = PORTFOLIO.credits && PORTFOLIO.credits[g.title + "|" + grp.name];
+          const ck = g.title + "|" + grp.name;
+          const cr = (isTR && PORTFOLIO.creditsTR && PORTFOLIO.creditsTR[ck]) || (PORTFOLIO.credits && PORTFOLIO.credits[ck]);
           if (cr) html += creditHtml(cr);
           html += renderItems(grp.items);
         });
@@ -617,29 +634,36 @@
         html += renderItems(g.items);
       }
     } else if (st.type === "arcade") {
-      html += `<h2>${esc(st.label)}</h2>`;
-      html += `<p class="role">Arrows / WASD · Space · click or tap · Esc to leave</p>`;
+      html += `<h2>${esc(tl(st.label))}</h2>`;
+      html += `<p class="role">${t("arcadeHint")}</p>`;
       html += `<canvas id="mg" width="480" height="360" class="mg-canvas"></canvas>`;
-      html += `<p class="mg-hint">Scores save locally. Beat your best.</p>`;
+      html += `<p class="mg-hint">${t("arcadeNote")}</p>`;
     } else {
       const p = st.project;
+      const pRole = isTR && p.roleTR ? p.roleTR : p.role;
+      const pYear = isTR && p.yearTR ? p.yearTR : p.year;
+      const pOne = isTR && p.oneLinerTR ? p.oneLinerTR : p.oneLiner;
+      const pDesc = isTR && p.descriptionTR ? p.descriptionTR : (p.description || p.summary);
+      const pDetails = isTR && p.detailsTR ? p.detailsTR : p.details;
+      const pTags = isTR && p.tagsTR ? p.tagsTR : p.tags;
       html += `<h2>${esc(p.title)}</h2>`;
-      html += `<p class="role">${esc(p.role)}${p.year ? " · " + esc(p.year) : ""}</p>`;
+      html += `<p class="role">${esc(pRole)}${pYear ? " · " + esc(pYear) : ""}</p>`;
       let fig = null;
       if (p.figure && typeof Art.gameFigure === "function") { try { fig = Art.gameFigure(p.figure); } catch (e) { } }
       if (fig) html += `<img class="shot keyart" src="${fig.toDataURL("image/png")}" alt="${esc(p.title)} key art">`;
       else if (p.image) html += `<img class="shot" src="${esc(p.image)}" alt="${esc(p.title)}">`;
       else html += `<div class="shot placeholder">key art</div>`;
-      if (p.oneLiner) html += `<p class="oneliner">“${esc(p.oneLiner)}”</p>`;
-      html += `<p>${esc(p.description || p.summary)}</p>`;
-      if (p.details && p.details.length) html += `<ul class="speclist">` + p.details.map(d => `<li><span class="k">${esc(d.label)}</span><span class="v">${esc(d.value)}</span></li>`).join("") + `</ul>`;
-      if (p.tags && p.tags.length) html += `<div class="tags">` + p.tags.map(t => `<span>${esc(t)}</span>`).join("") + `</div>`;
-      if (p.link) html += `<a class="btn" href="${esc(p.link)}" target="_blank" rel="noopener">Open project ↗</a>`;
+      if (pOne) html += `<p class="oneliner">“${esc(pOne)}”</p>`;
+      html += `<p>${esc(pDesc)}</p>`;
+      if (pDetails && pDetails.length) html += `<ul class="speclist">` + pDetails.map(d => `<li><span class="k">${esc(d.label)}</span><span class="v">${esc(d.value)}</span></li>`).join("") + `</ul>`;
+      if (pTags && pTags.length) html += `<div class="tags">` + pTags.map(tg => `<span>${esc(tg)}</span>`).join("") + `</div>`;
+      if (p.link) html += `<a class="btn" href="${esc(p.link)}" target="_blank" rel="noopener">${t("openProject")}</a>`;
     }
     body.innerHTML = html;
     document.getElementById("modal").classList.add("show");
     if (st.type === "arcade" && typeof startMiniGame === "function") {
-      currentGame = startMiniGame(st.game, document.getElementById("mg"));
+      currentGame = startMiniGame(st.game, document.getElementById("mg"),
+        { score: t("mgScore"), best: t("mgBest"), crash: t("mgCrash"), lost: t("mgLost"), retry: t("mgRetry") });
     }
   }
   function closeModal() {
@@ -976,7 +1000,7 @@
       ctx.fillStyle = "rgba(25,230,255," + (p * 0.6).toFixed(3) + ")"; ctx.fillRect(0, 0, Wc, Hc);
       ctx.globalCompositeOperation = "source-over";
       ctx.fillStyle = "#bff6ff"; ctx.font = "700 30px 'Orbitron','Segoe UI',sans-serif"; ctx.textAlign = "center";
-      ctx.fillText("OVERDRIVE", Wc / 2, 84); ctx.textAlign = "left";
+      ctx.fillText(t("overdrive"), Wc / 2, 84); ctx.textAlign = "left";
     }
 
     // #1 BLUR-BUFFER BLOOM: downscale the whole frame, add it back softly (brights bloom)
