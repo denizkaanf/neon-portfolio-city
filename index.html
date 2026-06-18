@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Deniz Kaan Fener — Neon Portfolio City</title>
+  <meta name="description" content="Deniz Kaan Fener — cinematographer, videographer, editor & photographer. Explore a walkable neon cyberpunk city portfolio." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Deniz Kaan Fener — Neon Portfolio City" />
+  <meta property="og:description" content="A walkable neon cyberpunk city portfolio — cinematography, video, photography & graphic design." />
+  <meta property="og:url" content="https://squirellpower.github.io/neon-portfolio-city/" />
+  <meta property="og:image" content="https://squirellpower.github.io/neon-portfolio-city/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Michroma&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- top bar -->
+  <header id="topbar">
+    <div class="who">
+      <span id="name-tag">Name</span>
+      <small id="role-tag">Role</small>
+    </div>
+    <div class="bar">
+      <span class="hint">WASD / Arrows &nbsp;·&nbsp; <b>E</b> interact</span>
+      <span id="chips" title="Hidden data-chips">◈ 0/5</span>
+      <button id="lang" title="Language EN / TR">TR</button>
+      <button id="mood" title="Mood / weather">🌙</button>
+      <button id="mute" title="Toggle sound" aria-label="Toggle sound">🔇</button>
+      <button id="hire">▸ HIRE ME</button>
+    </div>
+  </header>
+
+  <!-- holographic minimap (click a node to fast-travel) -->
+  <canvas id="minimap" width="170" height="170" title="Click a node to travel · M to hide"></canvas>
+
+  <!-- first-load hint + photo-mode hint -->
+  <div id="firsthint">◄ ► ▲ ▼ &nbsp;move &nbsp;·&nbsp; <b>E</b> &nbsp;interact</div>
+  <div id="photo-hint">PHOTO MODE &nbsp;·&nbsp; <b>S</b> save &nbsp;·&nbsp; <b>P</b> exit</div>
+
+  <!-- interaction prompt -->
+  <div id="prompt"></div>
+
+  <!-- project / about modal -->
+  <div id="modal">
+    <div id="modal-backdrop"></div>
+    <div class="panel">
+      <button id="modal-close" aria-label="Close">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- touch controls -->
+  <div id="touch">
+    <div id="dpad">
+      <button data-dir="up" class="up">▲</button>
+      <button data-dir="left" class="left">◀</button>
+      <button data-dir="right" class="right">▶</button>
+      <button data-dir="down" class="down">▼</button>
+    </div>
+    <button id="btn-action">E</button>
+  </div>
+
+  <!-- fullscreen image viewer -->
+  <div id="lightbox">
+    <img id="lightbox-img" src="" alt="" />
+    <button id="lightbox-close" aria-label="Close">✕</button>
+  </div>
+
+  <!-- cyberpunk scanline / vignette overlay -->
+  <div id="fx"></div>
+  <!-- animated film grain -->
+  <div id="grain"></div>
+  <!-- HUD chrome: corner brackets, edge framing, chromatic fringe -->
+  <div id="frame"></div>
+  <!-- glitch wipe played when entering a building -->
+  <div id="wipe"></div>
+
+  <div id="loader">initializing grid…</div>
+
+  <script src="galleries.js" charset="utf-8"></script>
+  <script src="data.js" charset="utf-8"></script>
+  <script src="sound.js" charset="utf-8"></script>
+  <script src="fx.js" charset="utf-8"></script>
+  <script src="minigames.js" charset="utf-8"></script>
+  <script src="art.js" charset="utf-8"></script>
+  <script src="game.js" charset="utf-8"></script>
+</body>
+</html>
